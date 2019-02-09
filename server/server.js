@@ -22,12 +22,18 @@ io.on("connection", socket => {
 
   socket.on("createMessage", (message, callback) => {
     io.emit("newMessage", generateMessage(message.from, message.text));
-    callback('Sent');
+    callback("Sent");
   });
 
-  socket.emit("newMessage", generateMessage('Admin', 'Welcom to the chat room'));
+  socket.emit(
+    "newMessage",
+    generateMessage("Admin", "Welcom to the chat room")
+  );
 
-  socket.broadcast.emit("newMessage", generateMessage('Admin', 'New user has joined the chat room'));
+  socket.broadcast.emit(
+    "newMessage",
+    generateMessage("Admin", "New user has joined the chat room")
+  );
 });
 
 server.listen(port, () => {
