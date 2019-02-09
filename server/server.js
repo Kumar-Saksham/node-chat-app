@@ -1,9 +1,11 @@
-const express = require('express');
-const path = require('path');
-const http = require('http');
-const socketIO = require('socket.io');
+const express = require("express");
+const path = require("path");
+const http = require("http");
+const socketIO = require("socket.io");
 
-const publicPath = path.join(__dirname, '../public');
+const { generateMessage } = require("./utils/message");
+
+const publicPath = path.join(__dirname, "../public");
 const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
@@ -11,44 +13,28 @@ const io = socketIO(server);
 
 app.use(express.static(publicPath));
 
-io.on('connection', socket => {
-    console.log('New user connected');
+io.on("connection", socket => {
+  console.log("New user connected");
 
-    socket.on('disconnect', () => {
-        console.log('User was disconnected');
-    });
+  socket.on("disconnect", () => {
+    console.log("User was disconnected");
+  });
 
-    socket.on('createMessage', message => {
-        io.emit('newMessage', {
-            from: message.from,
-            text: message.text,
-            createdAt: new Date().getTime()
-        });
+  socket.on("createMessage", message => {
+    io.emit("newMessage", generateMessage(message.from, message.text));
 
-        // socket.broadcast.emit('newMessage', {
-        //     from: message.from,
-        //     text: message.text,
-        //     createdAt: new Date().getTime()
-        // });
-    })
+    // socket.broadcast.emit('newMessage', {
+    //     from: message.from,
+    //     text: message.text,
+    //     createdAt: new Date().getTime()
+    // });
+  });
 
+  socket.emit("newMessage", generateMessage('Admin', 'Welcom to the chat room'));
 
-    socket.emit('newMessage', {
-        from: 'Admin',
-        text: 'welcome to this chat room',
-        createdAt: new Date().getTime()
-    });
-
-    socket.broadcast.emit('newMessage', {
-        from: 'Admin',
-        text: 'New user joined this chat room',
-        createdAt: new Date().getTime()
-    });
+  socket.broadcast.emit("newMessage", generateMessage('Admin', 'New user has joined the chat room'));
 });
 
-
-
-
 server.listen(port, () => {
-    console.log(`listening on port ${port}...`);
-})
+  console.log(`listening on port ${port}...`);
+});
