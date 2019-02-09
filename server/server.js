@@ -20,14 +20,9 @@ io.on("connection", socket => {
     console.log("User was disconnected");
   });
 
-  socket.on("createMessage", message => {
+  socket.on("createMessage", (message, callback) => {
     io.emit("newMessage", generateMessage(message.from, message.text));
-
-    // socket.broadcast.emit('newMessage', {
-    //     from: message.from,
-    //     text: message.text,
-    //     createdAt: new Date().getTime()
-    // });
+    callback('Sent');
   });
 
   socket.emit("newMessage", generateMessage('Admin', 'Welcom to the chat room'));
